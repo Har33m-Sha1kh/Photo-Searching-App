@@ -2,48 +2,45 @@
 var query=document.querySelector('#query'),
     count=document.querySelector('#count'),
     search=document.querySelector('#search'),
-    main=document.querySelector('main');   
+    main=document.querySelector('main');  
 
 
-
-// after search..
+// after search
 search.addEventListener('click',()=>{
     main.innerHTML=' ';
     fetchData(query.value,count.value);
 })  
 
-
-
-
-let fetchData=(Q,C)=>{
-
-    fetch(`https://api.unsplash.com/search/photos?query=${Q}&client_id=arWRz6Y-kBHGWYDZJmmZEwma_-jAyV4oCbWAJfalUvs`)
-    .then(response=>response.json())
-    .then(data=>{
-
-       let array=data.results;
-       let arr= array.slice(0,C);//required data
+async function fetchData(Q,C){     
+    try{
+        const response=await  fetch(`https://api.unsplash.com/search/photos?per_page=1000&query=${Q}&client_id=arWRz6Y-kBHGWYDZJmmZEwma_-jAyV4oCbWAJfalUvs`);
+        const data=await response.json();
        
+           console.log(data);
+           let array=data.results;
+           let arr= array.slice(0,C);//required data
+        
+     // inserting data.......
+            arr.forEach((e) => {
+                console.log(e.alt_discription);
+    
+              let dsc=e.description==null ? e.alt_description
+              : e.description ;
+    
+              let figure=document.createElement('figure');
+    
+              figure.innerHTML=`<img title='${dsc}' class='img' src="${e.urls.thumb}" width="300px">
+                <figcaption>
+                    <div class="like"><span class="red_text">Likes</span> &nbsp;&nbsp;<span class="likes">${e.likes}</span> </div>
+                </figcaption>`;
+    
+                main.appendChild(figure);
+    
+                
+             });    
 
- // inserting data.......
-     arr.forEach((e) => {
+    }catch(error){
+        console.error(error)
+    }
 
-    let dsc=e.description==null ?"Just catch up the unique moments": e.description ;
-
-    let figure=document.createElement('figure');
-
-       figure.innerHTML=`<img class='img' src="${e.urls.thumb}" width="300px">
-
-            <figcaption>
-                <p>${dsc}</p>
-                <br>
-                <div class="like"><span class="red_text">Likes</span> &nbsp;&nbsp;<span class="likes">${e.likes}</span> </div>
-            </figcaption>`;
-
-            main.appendChild(figure);
-     });
-
-    })
-    .catch(error=>console.error(error))
 }
-
